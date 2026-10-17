@@ -20,17 +20,16 @@ npm run build   # Produktions-Build
 | `/`         | Startseite mit Links zum Erstellen einer Liste und zum Beitreten. |
 | `/register` | Erstellt per Knopfdruck eine neue Liste und zeigt den Code zum Teilen an. |
 | `/join`     | Tritt einer Liste mit Code und Namen bei. |
-| `/list`     | Fügt einer Liste (per Code) einen Artikel hinzu. Die Artikel werden hier nicht angezeigt. |
+| `/list`     | Lädt eine Liste per Code und zeigt die Artikel mit Status (offen/gekauft) und Reservierung (Name oder «frei»); zusätzlich können Artikel hinzugefügt werden. |
 
 ## API-Routen
 
-Alle Routen akzeptieren nur `POST`.
-
-| Route           | Body                      | Beschreibung |
-|-----------------|---------------------------|--------------|
-| `/api/register` | –                         | Legt eine leere Liste an und gibt `{ code }` zurück (die ersten 6 Zeichen einer UUID). |
-| `/api/join`     | `{ code, memberName }`    | Fügt `memberName` zu den `members` der Liste hinzu; 404, wenn der Code unbekannt ist. |
-| `/api/addItem`  | `{ code, itemName }`      | Fügt der Liste einen neuen Artikel hinzu; 404, wenn der Code unbekannt ist. |
+| Route           | Methode, Eingabe                | Beschreibung |
+|-----------------|---------------------------------|--------------|
+| `/api/register` | `POST`, –                       | Legt eine leere Liste an und gibt `{ code }` zurück (die ersten 6 Zeichen einer UUID). |
+| `/api/join`     | `POST`, `{ code, memberName }`  | Fügt `memberName` zu den `members` der Liste hinzu; 404, wenn der Code unbekannt ist. |
+| `/api/addItem`  | `POST`, `{ code, itemName }`    | Fügt der Liste einen neuen Artikel hinzu; 404, wenn der Code unbekannt ist. |
+| `/api/items`    | `GET`, `?code=XXXXXX`           | Gibt `{ items, members }` der Liste zurück; 404 mit `{ error: 'List not found' }`, wenn der Code unbekannt ist. |
 
 ## Datenmodell
 
@@ -57,4 +56,12 @@ shoppingLists = {
 ## Hinweise
 
 - **Keine Persistenz:** Die Daten liegen nur im Arbeitsspeicher des Servers (`global.shoppingLists`) und sind nach einem Neustart weg.
-- **Keine Tests und keine CI-Pipeline:** Das Projekt enthält bisher weder automatisierte Tests noch eine CI-Konfiguration.
+- **Keine Tests:** Das Projekt enthält bisher keine automatisierten Tests. Die CI-Pipeline prüft nur Lint und Build (siehe «Übung W9»).
+
+## Übung W9
+
+Der Branch `uebung/w9-start` ist der Startpunkt für die Übung «Issue, Agent, Pull Request».
+
+- Zum Ausprobieren gibt es eine Demo-Liste mit dem Code `DEMO01` (Mitglieder Anna, Ben, Chiara und fünf Artikel). Sie ist auf `/list` und über `GET /api/items?code=DEMO01` abrufbar.
+- Bei jedem Pull Request läuft die CI-Pipeline (`.github/workflows/ci.yml`) mit `npm ci`, `npm run lint` und `npm run build`.
+- Für Issues und Pull Requests gibt es Vorlagen unter `.github/`.
