@@ -1,36 +1,60 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Einkaufsliste (shared-shopping-list)
 
-## Getting Started
+Eine kleine Next.js-App (Version 15, JavaScript) für eine gemeinsame Einkaufsliste. Wer eine Liste erstellt, erhält einen 6-stelligen Code. Mit diesem Code können andere der Liste beitreten und Artikel hinzufügen.
 
-First, run the development server:
+## Start
+
+Benötigt Node.js 20 (siehe `.nvmrc`, z. B. `nvm use`).
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm ci          # Abhängigkeiten gemäss package-lock.json installieren
+npm run dev     # Entwicklungsserver auf http://localhost:3000
+npm run lint    # ESLint (next lint)
+npm run build   # Produktions-Build
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Seiten
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+| Pfad        | Beschreibung |
+|-------------|--------------|
+| `/`         | Startseite mit Links zum Erstellen einer Liste und zum Beitreten. |
+| `/register` | Erstellt per Knopfdruck eine neue Liste und zeigt den Code zum Teilen an. |
+| `/join`     | Tritt einer Liste mit Code und Namen bei. |
+| `/list`     | Fügt einer Liste (per Code) einen Artikel hinzu. Die Artikel werden hier nicht angezeigt. |
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## API-Routen
 
-## Learn More
+Alle Routen akzeptieren nur `POST`.
 
-To learn more about Next.js, take a look at the following resources:
+| Route           | Body                      | Beschreibung |
+|-----------------|---------------------------|--------------|
+| `/api/register` | –                         | Legt eine leere Liste an und gibt `{ code }` zurück (die ersten 6 Zeichen einer UUID). |
+| `/api/join`     | `{ code, memberName }`    | Fügt `memberName` zu den `members` der Liste hinzu; 404, wenn der Code unbekannt ist. |
+| `/api/addItem`  | `{ code, itemName }`      | Fügt der Liste einen neuen Artikel hinzu; 404, wenn der Code unbekannt ist. |
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Datenmodell
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Die Listen liegen in einem Objekt, das den Code als Schlüssel verwendet (`src/app/api/data.js`):
 
-## Deploy on Vercel
+```js
+shoppingLists = {
+  "a1b2c3": {
+    members: ["Anna", "Ben"],      // Namen aus /api/join
+    items: [
+      {
+        id: 1730000000000,         // Date.now() beim Hinzufügen
+        name: "Milch",
+        reservedBy: null,          // wird beim Anlegen auf null gesetzt
+        completed: false           // wird beim Anlegen auf false gesetzt
+      }
+    ]
+  }
+}
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+`reservedBy` und `completed` werden bisher nur beim Anlegen gesetzt. Es gibt noch keine Route, die sie ändert.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Hinweise
+
+- **Keine Persistenz:** Die Daten liegen nur im Arbeitsspeicher des Servers (`global.shoppingLists`) und sind nach einem Neustart weg.
+- **Keine Tests und keine CI-Pipeline:** Das Projekt enthält bisher weder automatisierte Tests noch eine CI-Konfiguration.
