@@ -57,4 +57,12 @@ shoppingLists = {
 ## Hinweise
 
 - **Keine Persistenz:** Die Daten liegen nur im Arbeitsspeicher des Servers (`global.shoppingLists`) und sind nach einem Neustart weg.
-- **Keine Tests und keine CI-Pipeline:** Das Projekt enthält bisher weder automatisierte Tests noch eine CI-Konfiguration.
+- **Keine Tests:** Das Projekt enthält bisher keine automatisierten Tests. Die CI-Pipeline prüft nur Lint und Build (siehe «Übung W11»).
+
+## Übung W11
+
+Der Branch `uebung/w11-start` ist der Startpunkt für die Übung «Security in der Pipeline».
+
+- Die CI-Pipeline (`.github/workflows/ci.yml`) prüft bisher nur Lint und Build.
+- Die Datei `src/app/api/config.js` enthält absichtlich ein Test-Geheimnis. Es ist kein echter Schlüssel.
+- Das `Dockerfile` verwendet bewusst ein älteres Basis-Image (`node:18`).
